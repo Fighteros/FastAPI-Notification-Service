@@ -1,45 +1,55 @@
 # FastAPI Notification Service
 
-A standalone notification service built with FastAPI and Firebase Cloud Messaging (FCM) that can be integrated into any existing system.
+A FastAPI-based notification service that manages user reminders and sends notifications. The service tracks users with upcoming reminders and provides endpoints to manage and query user data.
+
+## Features
+
+- User management with reminder dates
+- Automatic detection of users with reminders due in the next hour
+- RESTful API endpoints for user operations
+- SQLAlchemy for database operations
+- Timezone-aware datetime handling
 
 ## Project Structure
 
 ```
-notification_service/
-├── __init__.py          # Package initialization
-├── config.py           # Configuration and Firebase setup
-├── models.py           # Pydantic models for request/response
-├── routes.py           # API endpoints
-└── services.py         # Business logic for notifications
+.
+├── app.py                 # Main FastAPI application
+├── db/
+│   ├── __init__.py
+│   └── database.py       # Database configuration
+├── users/
+│   ├── __init__.py
+│   ├── models.py         # SQLAlchemy models
+│   ├── schemas.py        # Pydantic models
+│   ├── routes.py         # API endpoints
+│   ├── service.py        # Business logic
+│   └── seeders.py        # Database seeding
+└── requirements.txt      # Project dependencies
 ```
-
-## Features
-
-- Send notifications to individual devices
-- Support for notification title, body, and additional data
-- Easy integration with existing systems
-- RESTful API endpoints
-- Modular and maintainable code structure
 
 ## Setup
 
-1. Install dependencies:
+1. Create a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Set up Firebase:
+3. Run the database seeder:
 
-   - Create a Firebase project in the Firebase Console
-   - Generate a new private key from Project Settings > Service Accounts
-   - Create a `.env` file with your Firebase credentials:
+```bash
+python seed_db.py
+```
 
-     ```
-
-     ```
-
-3. Run the service:
+4. Start the application:
 
 ```bash
 uvicorn app:app --reload
@@ -47,62 +57,65 @@ uvicorn app:app --reload
 
 ## API Endpoints
 
-### Send Notification
+### Users
 
-```http
-POST /notifications/send
-Content-Type: application/json
+#### GET /users/
 
-{
-    "token": "device_token",
-    "notification": {
-        "title": "Notification Title",
-        "body": "Notification Body",
-        "data": {
-            "key1": "value1",
-            "key2": "value2"
-        }
-    }
-}
-```
+Retrieve all users with optional pagination.
 
-## Integration
+- Query Parameters:
+  - `skip`: Number of records to skip (default: 0)
+  - `limit`: Maximum number of records to return (default: 100)
 
-To integrate this service into your existing system:
+#### GET /users/due-reminders
 
-1. Make HTTP requests to the notification endpoint from your application
-2. Store device tokens in your database
-3. Call the endpoint when you need to send notifications
+Retrieve users who have reminders due in the next hour.
 
-## Error Handling
+- Returns only active users
+- Orders results by reminder date (ascending)
+- Excludes users with past reminders or reminders beyond one hour
 
-The service includes error handling for:
+## Database Models
 
-- Invalid Firebase credentials
-- Invalid device tokens
-- Network issues
-- Invalid request payload
+### User
 
-## Security
-
-- Keep your Firebase credentials secure
-- Use environment variables for sensitive information
-- Consider implementing authentication for the API endpoints in production
+- `id`: Integer (Primary Key)
+- `email`: String (Unique)
+- `full_name`: String
+- `reminder_date`: DateTime (Timezone-aware)
+- `is_active`: Boolean
+- `created_at`: DateTime
+- `updated_at`: DateTime
 
 ## Development
 
-To run the service in development mode with auto-reload:
+### Seeding Test Data
+
+The seeder creates test users with various reminder scenarios:
+
+- Users with reminders due within the next hour
+- Users with reminders due beyond the next hour
+- Inactive users
+- Users with past reminders
+
+Run the seeder:
 
 ```bash
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
+python seed_db.py
 ```
 
-## Production Deployment
+### Timezone Handling
 
-For production deployment:
+The application uses timezone-aware datetime objects (UTC) for all date/time operations to ensure consistent behavior across different timezones.
 
-1. Set up proper authentication
-2. Use a production-grade ASGI server
-3. Configure proper logging
-4. Set up monitoring
-5. Use environment variables for configuration
+## Requirements
+
+- Python 3.8+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Uvicorn
+
+## License
+
+MIT

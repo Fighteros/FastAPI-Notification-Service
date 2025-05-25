@@ -1,13 +1,16 @@
 from fastapi import FastAPI
-
-from notification_service.routes import router
+from notification_service.routes import router as notification_router
 from notification_service.config import initialize_firebase
+from users.routes import router as user_router
+from db.database import engine, Base
 
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Notification Service",
-    description="A standalone notification service using FastAPI and Firebase Cloud Messaging",
+    title="User Management and Notification Service",
+    description="A service that combines user management with notification capabilities",
     version="1.0.0"
 )
 
@@ -15,7 +18,8 @@ app = FastAPI(
 initialize_firebase()
 
 # Include routers
-app.include_router(router)
+app.include_router(user_router)
+app.include_router(notification_router)
 
 if __name__ == "__main__":
     import uvicorn
