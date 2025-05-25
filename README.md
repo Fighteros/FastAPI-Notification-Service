@@ -15,8 +15,7 @@ notification_service/
 
 ## Features
 
-- Send notifications to single devices
-- Send notifications to multiple devices
+- Send notifications to individual devices
 - Support for notification title, body, and additional data
 - Easy integration with existing systems
 - RESTful API endpoints
@@ -35,13 +34,9 @@ pip install -r requirements.txt
    - Create a Firebase project in the Firebase Console
    - Generate a new private key from Project Settings > Service Accounts
    - Create a `.env` file with your Firebase credentials:
+
      ```
-     FIREBASE_PROJECT_ID=your-project-id
-     FIREBASE_PRIVATE_KEY_ID=your-private-key-id
-     FIREBASE_PRIVATE_KEY=your-private-key
-     FIREBASE_CLIENT_EMAIL=your-client-email
-     FIREBASE_CLIENT_ID=your-client-id
-     FIREBASE_CLIENT_CERT_URL=your-client-cert-url
+
      ```
 
 3. Run the service:
@@ -52,7 +47,7 @@ uvicorn app:app --reload
 
 ## API Endpoints
 
-### Send Single Notification
+### Send Notification
 
 ```http
 POST /notifications/send
@@ -71,32 +66,13 @@ Content-Type: application/json
 }
 ```
 
-### Send Multiple Notifications
-
-```http
-POST /notifications/send-multi
-Content-Type: application/json
-
-{
-    "tokens": ["device_token1", "device_token2"],
-    "notification": {
-        "title": "Notification Title",
-        "body": "Notification Body",
-        "data": {
-            "key1": "value1",
-            "key2": "value2"
-        }
-    }
-}
-```
-
 ## Integration
 
 To integrate this service into your existing system:
 
-1. Make HTTP requests to the notification endpoints from your application
+1. Make HTTP requests to the notification endpoint from your application
 2. Store device tokens in your database
-3. Call the appropriate endpoint when you need to send notifications
+3. Call the endpoint when you need to send notifications
 
 ## Error Handling
 

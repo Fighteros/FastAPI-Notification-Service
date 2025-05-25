@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from notification_service import initialize_firebase, router
+
+from notification_service.routes import router
+from notification_service.config import initialize_firebase
+
 
 # Initialize FastAPI app
 app = FastAPI(
